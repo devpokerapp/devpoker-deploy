@@ -1,0 +1,118 @@
+version: "3"
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: devpoker-rabbitmq
+    # TODO: credentials
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 30s
+      timeout: 30s
+      retries: 10
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - devpoker-network
+
+  adminer:
+    image: adminer
+    container_name: devpoker-adminer
+    ports:
+      - 8032:8080
+    networks:
+      - devpoker-network
+
+  # TODO: replace with cloud managed database
+  db:
+    image: postgres:13
+    container_name: devpoker-db
+    environment:
+      - POSTGRES_USER=$DB_USER
+      - POSTGRES_PASSWORD=$DB_PASSWORD
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - devpoker-db-volume:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      - devpoker-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:23.0.4
+    container_name: devpoker-keycloak
+    command: start
+    environment:
+      - KEYCLOAK_ADMIN=$KEYCLOAK_ADMIN
+      - KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://db:5432/$DB_NAME_KEYCLOAK
+      - KC_DB_USERNAME=$DB_USER
+      - KC_DB_PASSWORD=$DB_PASSWORD
+      - KC_HOSTNAME=localhost
+    ports:
+      - 8080:8080
+    networks:
+      - devpoker-network
+    depends_on:
+      db:
+        condition: service_started
+
+  gateway:
+    image: $REGISTRY_URL/devpoker-gateway
+    container_name: devpoker-gateway
+    environment:
+      - RABBIT_PASSWORD=$RABBIT_PASSWORD
+      - RABBIT_USER=$RABBIT_USER
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_MANAGEMENT_PORT=15672
+    ports:
+      - 8000:8000
+    networks:
+      - devpoker-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  estimate:
+    image: $REGISTRY_URL/devpoker-estimate
+    container_name: devpoker-estimate
+    environment:
+      - RABBIT_PASSWORD=$RABBIT_PASSWORD
+      - RABBIT_USER=$RABBIT_USER
+      - RABBIT_HOST=rabbitmq
+      - RABBIT_PORT=5672
+      - RABBIT_MANAGEMENT_PORT=15672
+      - DB_HOST=db
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_NAME=$DB_NAME_ESTIMATE
+    networks:
+      - devpoker-network
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      db:
+        condition: service_started
+
+  web:
+    image: $REGISTRY_URL/devpoker-web
+    container_name: devpoker-web
+    ports:
+      - 3000:3000
+    environment:
+      - GATEWAY_URL=ws://$SERVER_URL/ws
+      - KEYCLOAK_URL=http://$SERVER_URL/auth
+      - KEYCLOAK_REALM=$KEYCLOAK_REALM
+      - KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID
+
+networks:
+  devpoker-network:
+    name: devpoker-network
+    external: false
+
+volumes:
+  devpoker-db-volume:
+    name: devpoker-db-volume
