@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# requirements:
+# - awscli (pre-configured)
+# - docker
+# - docker-compose
+
 AWS_ACCOUNT_ID=810663594687
 AWS_REGION=us-east-2
 
