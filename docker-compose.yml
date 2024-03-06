@@ -103,8 +103,8 @@ services:
     ports:
       - 3000:3000
     environment:
-      - GATEWAY_URL=ws://$SERVER_URL/ws
-      - KEYCLOAK_URL=http://$SERVER_URL/auth
+      - GATEWAY_URL=wss://$SERVER_URL/ws
+      - KEYCLOAK_URL=https://$SERVER_URL/auth
       - KEYCLOAK_REALM=$KEYCLOAK_REALM
       - KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID
 
