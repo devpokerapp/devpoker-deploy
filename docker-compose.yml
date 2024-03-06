@@ -50,7 +50,11 @@ services:
       - KC_DB_URL=jdbc:postgresql://db:5432/$DB_NAME_KEYCLOAK
       - KC_DB_USERNAME=$DB_USER
       - KC_DB_PASSWORD=$DB_PASSWORD
-      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME=$SERVER_URL
+      - KC_HOSTNAME_PATH=/auth
+      - KC_HOSTNAME_ADMIN=$SERVER_URL/auth
+      - KC_PROXY=edge
+      - KC_HOSTNAME_DEBUG=true
     ports:
       - 8080:8080
     networks:
