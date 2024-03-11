@@ -50,11 +50,13 @@ services:
       - KC_DB_URL=jdbc:postgresql://db:5432/$DB_NAME_KEYCLOAK
       - KC_DB_USERNAME=$DB_USER
       - KC_DB_PASSWORD=$DB_PASSWORD
-      - KC_HOSTNAME=$SERVER_URL
-      - KC_HOSTNAME_PATH=/auth
-      - KC_HOSTNAME_ADMIN=$SERVER_URL/auth
+      - KC_HOSTNAME=$SSO_SERVER_URL
+      - KC_HOSTNAME_ADMIN=$SSO_SERVER_URL
+      # TODO: hide admin console
       - KC_PROXY=edge
+      - KC_PROXY_HEADERS=xforwarded
       - KC_HOSTNAME_DEBUG=true
+      - KC_HOSTNAME_STRICT=false
     ports:
       - 8080:8080
     networks:
@@ -108,7 +110,7 @@ services:
       - 3000:3000
     environment:
       - GATEWAY_URL=wss://$SERVER_URL/ws
-      - KEYCLOAK_URL=https://$SERVER_URL/auth
+      - KEYCLOAK_URL=https://$SSO_SERVER_URL
       - KEYCLOAK_REALM=$KEYCLOAK_REALM
       - KEYCLOAK_CLIENT_ID=$KEYCLOAK_CLIENT_ID
 
