@@ -13,5 +13,6 @@ aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --
 docker pull $REGISTRY_URL/devpoker-gateway:latest
 docker pull $REGISTRY_URL/devpoker-estimate:latest
 docker pull $REGISTRY_URL/devpoker-web:latest
+docker pull $REGISTRY_URL/devpoker-keycloak:latest
 
 docker-compose -f docker-compose.yml --env-file=.env up -d

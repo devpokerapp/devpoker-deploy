@@ -40,9 +40,9 @@ services:
       - devpoker-network
 
   keycloak:
-    image: quay.io/keycloak/keycloak:23.0.4
+    image: $REGISTRY_URL/devpoker-keycloak
     container_name: devpoker-keycloak
-    command: start
+    command: start --optimized
     environment:
       - KEYCLOAK_ADMIN=$KEYCLOAK_ADMIN
       - KEYCLOAK_ADMIN_PASSWORD=$KEYCLOAK_ADMIN_PASSWORD
