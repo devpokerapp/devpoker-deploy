@@ -4,6 +4,7 @@ services:
   rabbitmq:
     image: rabbitmq:3-management
     container_name: devpoker-rabbitmq
+    restart: always
     # TODO: credentials
     healthcheck:
       test: rabbitmq-diagnostics check_port_connectivity
@@ -19,6 +20,7 @@ services:
   adminer:
     image: adminer
     container_name: devpoker-adminer
+    restart: always
     ports:
       - 8032:8080
     networks:
@@ -28,6 +30,7 @@ services:
   db:
     image: postgres:13
     container_name: devpoker-db
+    restart: always
     environment:
       - POSTGRES_USER=$DB_USER
       - POSTGRES_PASSWORD=$DB_PASSWORD
@@ -42,6 +45,7 @@ services:
   keycloak:
     image: $REGISTRY_URL/devpoker-keycloak
     container_name: devpoker-keycloak
+    restart: always
     command: start --optimized
     environment:
       - KEYCLOAK_ADMIN=$KEYCLOAK_ADMIN
@@ -68,6 +72,7 @@ services:
   gateway:
     image: $REGISTRY_URL/devpoker-gateway
     container_name: devpoker-gateway
+    restart: always
     environment:
       - RABBIT_PASSWORD=$RABBIT_PASSWORD
       - RABBIT_USER=$RABBIT_USER
@@ -85,6 +90,7 @@ services:
   estimate:
     image: $REGISTRY_URL/devpoker-estimate
     container_name: devpoker-estimate
+    restart: always
     environment:
       - RABBIT_PASSWORD=$RABBIT_PASSWORD
       - RABBIT_USER=$RABBIT_USER
@@ -106,6 +112,7 @@ services:
   web:
     image: $REGISTRY_URL/devpoker-web
     container_name: devpoker-web
+    restart: always
     ports:
       - 3000:3000
     environment:
